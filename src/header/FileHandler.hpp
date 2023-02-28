@@ -17,8 +17,9 @@ class FileHandler;
 class FileHandler{
 
     static string GetStdoutFromCommand(string);     // execute bash commands, get the output
-    static bool checkFilename(string);     // check illegal symbols in filename
+
 public:
+    static bool checkFilename(string);     // check illegal symbols in filename
     static FileHandlerReply readFile(string);       // read noteFiles
     static FileHandlerReply appendFile(string,string);     // append content to files
     static FileHandlerReply createFile(string);
@@ -30,7 +31,7 @@ struct FileHandlerReply{
     int error_code;
 };
 
-static bool checkFilename(string str){
+bool FileHandler::checkFilename(string str){
     for (char &ch : str){
         if (ch == '\'' || ch == '"' || ch =='\\'){
             return false;
@@ -78,7 +79,9 @@ FileHandlerReply FileHandler::readFile(string path){
 
 FileHandlerReply FileHandler::appendFile(string filename, string content){
     FileHandlerReply reply;
-    
+    if(FileHandler::checkFilename(filename)){
+        return FileHandlerReply{"Illegal filename", 1};
+    }
     if(content.size() > 1000){
        return FileHandlerReply{filename, 1};
     }
@@ -90,9 +93,23 @@ FileHandlerReply FileHandler::appendFile(string filename, string content){
         reply.response = "Cannot open file";
     }
     fout << content << std::endl;
+    return FileHandlerReply{"", 0};
 }
 
 FileHandlerReply FileHandler::createFile(string user_filename){
-  
+    if(!FileHandler::checkFilename(user_filename)){
+        return FileHandlerReply{"Illegal filename", 1};
+    }
+    srand(time(0));
+    int randint = rand();
+    std::stringstream ss;
+    ss << randint;
 
+    string random_filename =  user_filename +"_" + ss.str();
+    string execute_command = "touch " + random_filename;
+    string ret = FileHandler::GetStdoutFromCommand(execute_command);
+    if(ret.find("Permission denied") != string::npos){
+        return FileHandlerReply{ret, 1};
+    }
+    return FileHandlerReply{random_filename, 0};
 }
