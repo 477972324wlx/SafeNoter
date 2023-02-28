@@ -28,6 +28,8 @@ int main(int args, char **argv){
     }
 
     ClientSocketHandler client = ClientSocketHandler(port, addr);
+    client.trySend(oper);
+    
 
     if(oper == "read"){
         

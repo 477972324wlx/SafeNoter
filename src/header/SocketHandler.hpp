@@ -54,11 +54,17 @@ public:
         return count > 0;
         //send(clientfd, buf, sizeof(buf),0);
     }
+    void trySend(string ss){
+        if (ss.size() > 1000){
+            perror("String is too long!");
+            return;
+        }
+        write(clientfd, ss.c_str(), ss.size());
+    }
 
 };
 
 class ClientSocketHandler : SocketHandler{
-
 public:
     ClientSocketHandler(unsigned short& _port, const string& _addr):SocketHandler(_port,_addr){
         int ret = connect(sockfd, (sockaddr*)&sock_addr, sizeof(sock_addr));
@@ -67,9 +73,16 @@ public:
         } 
     }
     
-    void trySend(){
-        fgets(buf, 100, stdin);
-        write(sockfd,buf,sizeof(buf));
+    void trySend(string ss){
+        if (ss.size() > 1000){
+            perror("String is too long!");
+            return;
+        }
+        write(sockfd, ss.c_str(), ss.size());
+    }
+    bool tryReceive(){
+        int count = recv(sockfd, buf, sizeof(buf), 0);
+        return count >= 0;
     }
 };
 
