@@ -2,13 +2,11 @@
 #include "header/SocketHandler.hpp"
 using namespace std;
 
-/*
-int genSocketPair(){
-    srand(time(0));
-    int port = rand() % 10000 + 5000;
-    return port;
-}
-*/
+
+void ReadNote(ClientSocketHandler*, string);
+void WriteNote(ClientSocketHandler*, string);
+void RemoveNote(ClientSocketHandler*, string);
+
 
 static int exec_prog(const char **argv)
 {
@@ -49,10 +47,10 @@ int main(int args, char **argv){
     }
 
     
-    const char *my_argv[64] = {"./bin/Server", "readfs","hisdfsd",NULL};
+    const char *my_argv[64] = {"./bin/Server", "read",argv[2],NULL};
    
     exec_prog(my_argv);
-    usleep(500);
+    usleep(1000);
 
     //store error messages;
     string err;
@@ -60,12 +58,47 @@ int main(int args, char **argv){
     
     //connect to server
     ClientSocketHandler client = ClientSocketHandler(port, addr);
+    cout << "Connected" << endl;
+    
+    if(oper == "read"){
+        ReadNote(&client, argv[2]);
+    } else if(oper == "write"){
+        WriteNote(&client,argv[2]);
+    } else if (oper ==  "remove"){
+        RemoveNote(&client,argv[2]);
+    }
 
-
+    /*
     client.tryReceive(err);
 
     cout << client.getBufferString() << endl;
 
+    string str;
+    while(cin >> str){
+        client.trySend(str);
+        client.tryReceive(err);
+        cout << client.getBufferString() <<endl;
+    }
+    */
+    
   
     return 0;
+}
+
+void ReadNote(ClientSocketHandler* client, string filename){
+    string err;
+    while(1){
+        client->tryReceive(err);
+        if (err != ""){
+            break;
+        }
+        cout << client->getBufferString() << endl;
+        
+    }   
+}
+void WriteNote(ClientSocketHandler*, string filename){
+
+}
+void RemoveNote(ClientSocketHandler*, string filename){
+    
 }

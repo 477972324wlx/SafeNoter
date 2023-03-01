@@ -57,11 +57,12 @@ public:
             perror("Unable to accept!\n");
         }
     }
-    void tryReceive(){
+    bool tryReceive(){
         memset(buf,0,sizeof(buf));
         int count = recv(clientfd, buf, sizeof(buf),0);
         //printf("%s",buf);
         //send(clientfd, buf, sizeof(buf),0);
+        return count != 0;
     }
     void trySend(string ss){
         if (ss.size() > 1000){
@@ -95,6 +96,9 @@ public:
     void tryReceive(string &err_msg){
         memset(buf,0,sizeof(buf));
         int count = recv(sockfd, buf, sizeof(buf), 0);
+        if(count == 0){
+            err_msg = "Empty";
+        }
     }
 };
 

@@ -16,9 +16,10 @@ class FileHandler;
 */
 class FileHandler{
 
+public:
+    static FILE*  GetPipeFromCommand(string);
     static string GetStdoutFromCommand(string);     // execute bash commands, get the output
 
-public:
     static bool checkFilename(string);     // check illegal symbols in filename
     static FileHandlerReply readFile(string);       // read noteFiles
     static FileHandlerReply appendFile(string,string);     // append content to files
@@ -41,15 +42,21 @@ bool FileHandler::checkFilename(string str){
 }
 
 
+FILE * FileHandler::GetPipeFromCommand(string cmd){
+    FILE* stream;
+    cmd.append(" 2>&1");
+    stream = popen(cmd.c_str(), "r");
+
+    return stream;
+}
 
 string FileHandler::GetStdoutFromCommand(string cmd) {
     string data;
-    FILE * stream;
+   
     const int max_buffer = 256;
     char buffer[max_buffer];
-    cmd.append(" 2>&1"); // Do we want STDERR?
-
-    stream = popen(cmd.c_str(), "r");
+    
+    FILE *stream  = FileHandler::GetPipeFromCommand(cmd);
     if (stream) {
         while (!feof(stream))
             if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
