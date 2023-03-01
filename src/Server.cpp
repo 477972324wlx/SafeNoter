@@ -69,12 +69,35 @@ void ReadNote(ServerSocketHandler * server, string filename){
                 
             }
         pclose(stream);
+    } else {
+        server->trySend("Read Error!\n");
     }
 }
 
-void WriteNote(ServerSocketHandler*,string){
+void WriteNote(ServerSocketHandler* server,string filename){
+    //First Create File
+    FileHandlerReply reply = FileHandler::createFile(filename);
 
+    if(reply.error_code){
+        exit(0);
+    }
+
+    string filename = reply.response;
+
+    while(server->tryReceive()){
+        string str = server->getBufferString();
+        reply = FileHandler::appendFile(filename, str);
+        if(reply.error_code){
+            exit(0);
+        }
+    }
 }
-void RemoveNote(ServerSocketHandler*,string){
 
+void RemoveNote(ServerSocketHandler* server,string filename){
+    string execute_command = "rm *" + filename + "*";
+    string ret = FileHandler::GetStdoutFromCommand(execute_command);
+    if (ret == ""){
+        ret = "Success!";
+    }
+    server->trySend(ret);
 }

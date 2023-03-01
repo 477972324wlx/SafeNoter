@@ -83,6 +83,7 @@ public:
         int ret = connect(sockfd, (sockaddr*)&sock_addr, sizeof(sock_addr));
         if (ret < 0){
             perror("Cannot connect to Server!\n");
+            exit(0);
         } 
     }
     

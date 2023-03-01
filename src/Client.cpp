@@ -96,9 +96,15 @@ void ReadNote(ClientSocketHandler* client, string filename){
         
     }   
 }
-void WriteNote(ClientSocketHandler*, string filename){
-
+void WriteNote(ClientSocketHandler* client, string filename){
+    string str;
+    string err;
+    while(getline(cin, str)){
+        client->trySend(err);
+    }
 }
-void RemoveNote(ClientSocketHandler*, string filename){
-    
+void RemoveNote(ClientSocketHandler* client, string filename){
+    string err;
+    client->tryReceive(err);
+    cout << client->getBufferString() << endl;
 }
