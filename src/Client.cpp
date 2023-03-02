@@ -3,9 +3,9 @@
 using namespace std;
 
 
-void ReadNote(ClientSocketHandler*, string);
-void WriteNote(ClientSocketHandler*, string);
-void RemoveNote(ClientSocketHandler*, string);
+void ReadNote(ClientSocketHandler*);
+void WriteNote(ClientSocketHandler*);
+void RemoveNote(ClientSocketHandler*);
 
 
 static int exec_prog(const char **argv)
@@ -47,7 +47,7 @@ int main(int args, char **argv){
     }
 
     
-    const char *my_argv[64] = {"./bin/Server", "read",argv[2],NULL};
+    const char *my_argv[64] = {"./bin/Server", argv[1],argv[2],NULL};
    
     exec_prog(my_argv);
     usleep(1000);
@@ -58,14 +58,14 @@ int main(int args, char **argv){
     
     //connect to server
     ClientSocketHandler client = ClientSocketHandler(port, addr);
-    cout << "Connected" << endl;
+    //cout << "Connected" << endl;
     
     if(oper == "read"){
-        ReadNote(&client, argv[2]);
+        ReadNote(&client);
     } else if(oper == "write"){
-        WriteNote(&client,argv[2]);
+        WriteNote(&client);
     } else if (oper ==  "remove"){
-        RemoveNote(&client,argv[2]);
+        RemoveNote(&client);
     }
 
     /*
@@ -85,7 +85,7 @@ int main(int args, char **argv){
     return 0;
 }
 
-void ReadNote(ClientSocketHandler* client, string filename){
+void ReadNote(ClientSocketHandler* client){
     string err;
     while(1){
         client->tryReceive(err);
@@ -96,14 +96,18 @@ void ReadNote(ClientSocketHandler* client, string filename){
         
     }   
 }
-void WriteNote(ClientSocketHandler* client, string filename){
-    string str;
-    string err;
+void WriteNote(ClientSocketHandler* client) {
+    string str, err, filename;
+
+    client->tryReceive(err);
+    filename = client->getBufferString();
+
+    cout << "File Created :" << filename << endl;
     while(getline(cin, str)){
-        client->trySend(err);
+        client->trySend(str);
     }
 }
-void RemoveNote(ClientSocketHandler* client, string filename){
+void RemoveNote(ClientSocketHandler* client){
     string err;
     client->tryReceive(err);
     cout << client->getBufferString() << endl;

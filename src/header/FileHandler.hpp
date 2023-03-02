@@ -92,14 +92,10 @@ FileHandlerReply FileHandler::appendFile(string filename, string content){
     if(content.size() > 1000){
        return FileHandlerReply{filename, 1};
     }
- 
     ofstream fout(filename, std::ios::app);
     
-    if (!fout){
-        reply.error_code = 1;
-        reply.response = "Cannot open file";
-    }
     fout << content << std::endl;
+    fout.close();
     return FileHandlerReply{"", 0};
 }
 
@@ -108,12 +104,12 @@ FileHandlerReply FileHandler::createFile(string user_filename){
         return FileHandlerReply{"Illegal filename", 1};
     }
     srand(time(0));
-    int randint = rand();
+    int randint = rand() % 1000000;
     std::stringstream ss;
     ss << randint;
 
     string random_filename =  user_filename +"_" + ss.str();
-    string execute_command = "touch " + random_filename;
+    string execute_command = "touch test/" + random_filename;
     string ret = FileHandler::GetStdoutFromCommand(execute_command);
     if(ret.find("Permission denied") != string::npos){
         return FileHandlerReply{ret, 1};

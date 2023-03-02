@@ -34,16 +34,6 @@ int main(int args, char ** argv){
         RemoveNote(&server, argv[2]);
     }
 
-    // Get operation type : Read/Write/Remove
-    // server.tryReceive();
-    /*
-    
-    server.trySend(string(argv[0]) + string(argv[1]));
-    
-    while(server.tryReceive()){
-        server.trySend("OK! Message is" + server.getBufferString());
-    }
-    */
 
 
     server.closeSocket();
@@ -54,10 +44,10 @@ int main(int args, char ** argv){
 void ReadNote(ServerSocketHandler * server, string filename){
     const int MAX_BUFFER  = 1024;
     char buffer[MAX_BUFFER];
-    cout << "Start Reading" << endl;
+    //cout << "Start Reading" << endl;
     string execute_command = "cat *"+filename+"*";
 
-    cout << execute_command << endl;
+    //cout << execute_command << endl;
 
     FILE * stream = FileHandler::GetPipeFromCommand(execute_command);
     if (stream) {
@@ -82,11 +72,14 @@ void WriteNote(ServerSocketHandler* server,string filename){
         exit(0);
     }
 
-    string filename = reply.response;
+    filename = reply.response;
+    server->trySend(filename);
 
+    ofstream fout(filename, ios::app);
     while(server->tryReceive()){
         string str = server->getBufferString();
-        reply = FileHandler::appendFile(filename, str);
+        //reply = FileHandler::appendFile(filename, str);
+        fout << str << endl;
         if(reply.error_code){
             exit(0);
         }
