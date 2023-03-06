@@ -86,9 +86,7 @@ FileHandlerReply FileHandler::readFile(string path){
 
 FileHandlerReply FileHandler::appendFile(string filename, string content){
     FileHandlerReply reply;
-    if(FileHandler::checkFilename(filename)){
-        return FileHandlerReply{"Illegal filename", 1};
-    }
+
     if(content.size() > 1000){
        return FileHandlerReply{filename, 1};
     }
@@ -99,20 +97,11 @@ FileHandlerReply FileHandler::appendFile(string filename, string content){
     return FileHandlerReply{"", 0};
 }
 
-FileHandlerReply FileHandler::createFile(string user_filename){
-    if(!FileHandler::checkFilename(user_filename)){
-        return FileHandlerReply{"Illegal filename", 1};
-    }
-    srand(time(0));
-    int randint = rand() % 1000000;
-    std::stringstream ss;
-    ss << randint;
-
-    string random_filename =  user_filename +"_" + ss.str();
-    string execute_command = "touch test/" + random_filename;
+FileHandlerReply FileHandler::createFile(string filename){
+    string execute_command = "touch " + filename;
     string ret = FileHandler::GetStdoutFromCommand(execute_command);
     if(ret.find("Permission denied") != string::npos){
         return FileHandlerReply{ret, 1};
     }
-    return FileHandlerReply{random_filename, 0};
+    return FileHandlerReply{filename, 0};
 }

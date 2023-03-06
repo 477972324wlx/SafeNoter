@@ -17,8 +17,6 @@ unsigned short port = 4396;
 int main(int args, char ** argv){
 
 
-
-
     ServerSocketHandler server = ServerSocketHandler(port, addr);
     
      

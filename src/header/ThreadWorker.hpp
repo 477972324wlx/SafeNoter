@@ -1,18 +1,22 @@
 #include <bits/stdc++.h>
 
 #include "FileHandler.hpp"
+#include "util.hpp"
+
 #define MAX_BUFFER 1024
 struct ThreadArgs{
     int clientfd;
-    char filename[256];
+    char filename[MAX_BUFFER];
     char buf[MAX_BUFFER];
 
     int pid;
     std::mutex mu;
 };
+typedef std::function<void(ThreadArgs*)> ThreadFunction;
+
 
 void ThreadRead(ThreadArgs *args){
-    cout << "Start Reading!" << endl;
+    cout << "Start Reading!\n";
 
     string execute_command = "cat *"+ string(args->filename)+"*.note";
 
@@ -29,13 +33,64 @@ void ThreadRead(ThreadArgs *args){
 }
 
 void ThreadWrite(ThreadArgs *args){
+    
+    string user_filename(args->filename);
+    string local_filename, suffix, password, execute_command;
+    FileHandlerReply reply;
 
+    cout << "Start Writing\n";
+
+    if(util::checkFilename(user_filename) == false){
+        return;
+    }
+
+
+    suffix = util::makeRandStr(6, true);
+    local_filename = user_filename + "_" + suffix;
+
+    password = util::makeRandStr(6, true);
+
+
+    reply = FileHandler::createFile(local_filename + ".note");
+    if(reply.error_code){
+        return ;
+    }
+
+    reply = FileHandler::createFile(local_filename + ".pwd");
+        if(reply.error_code){
+        return ;
+    }
+
+    reply = FileHandler::appendFile(local_filename + ".pwd", password);
+    cout << reply.response << endl;
+
+    sprintf(args->buf, "Filename: %s,Password: %s\n", local_filename.c_str(), password.c_str());
+
+    write(args->clientfd, args->buf, strlen(args->buf));
+    
+
+    ofstream fout(local_filename + ".note");
+
+    bool first = true;
+    while(1){
+        memset(args->buf, 0 ,sizeof(args->buf));
+        int cnt = read(args->clientfd, args->buf, MAX_BUFFER);
+        if(!cnt) break;
+    
+        // Remove the empty line
+        fout << args->buf ;
+        if(!first)
+            cout << endl;
+        first = false;
+    }
+    fout.close();
 }
+
 void ThreadRemove(ThreadArgs *args){
     
 }
 
-typedef std::function<void(ThreadArgs*)> ThreadFunction;
+
 bool LoadFileName(ThreadArgs* args){
     int len = strlen(args->buf);
     int id = 0;
@@ -56,8 +111,14 @@ bool LoadFileName(ThreadArgs* args){
 
 ThreadFunction getOperation(ThreadArgs * args){
     memset(args->buf,0,sizeof(args->buf));
-    read(args->clientfd, args->buf, MAX_BUFFER);
-   // cout << args->buf << endl;
+    int cnt = read(args->clientfd, args->buf, MAX_BUFFER);
+
+
+    // Arguments too long, drop
+    if(cnt > 1000){
+        return NULL;
+    }
+
     if(!LoadFileName(args)){
         return NULL;
     }
