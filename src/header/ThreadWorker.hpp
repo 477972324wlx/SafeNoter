@@ -87,7 +87,12 @@ void ThreadWrite(ThreadArgs *args){
 }
 
 void ThreadRemove(ThreadArgs *args){
-    
+    FileHandlerReply reply = FileHandler::testFile("*"+string(args->filename) +".note");
+    if(reply.error_code){
+        return;
+    }
+    reply = FileHandler::readFile("*"+string(args->filename)+".note");
+
 }
 
 

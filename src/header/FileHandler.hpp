@@ -24,6 +24,7 @@ public:
     static FileHandlerReply readFile(string);       // read noteFiles
     static FileHandlerReply appendFile(string,string);     // append content to files
     static FileHandlerReply createFile(string);
+    static FileHandlerReply testFile(string);
     
 };
 
@@ -100,6 +101,18 @@ FileHandlerReply FileHandler::appendFile(string filename, string content){
 FileHandlerReply FileHandler::createFile(string filename){
     string execute_command = "touch " + filename;
     string ret = FileHandler::GetStdoutFromCommand(execute_command);
+    if(ret.find("Permission denied") != string::npos){
+        return FileHandlerReply{ret, 1};
+    }
+    return FileHandlerReply{filename, 0};
+}
+
+FileHandlerReply FileHandler::testFile(string filename){
+    string execute_command = "file " + filename;
+    string ret = FileHandler::GetStdoutFromCommand(execute_command);
+    if(ret.find("(No such file or directory)") != string::npos){
+        return FileHandlerReply{ret,1};
+    }
     if(ret.find("Permission denied") != string::npos){
         return FileHandlerReply{ret, 1};
     }

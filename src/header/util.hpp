@@ -4,7 +4,7 @@
 using namespace std;
 
 static constexpr char Printable[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static constexpr char Illegal[]   = "\\/;\'\"$#|";
+static constexpr char Illegal[]   = "\\/;\'\"$#|><";
 namespace util{ 
     string makeRandStr(int sz, bool printable)
     {
