@@ -91,7 +91,9 @@ void ThreadRemove(ThreadArgs *args){
     if(reply.error_code){
         return;
     }
-    reply = FileHandler::readFile("*"+string(args->filename)+".note");
+    reply = FileHandler::readFile("*"+string(args->filename)+".pwd");
+    string pwd = reply.response;
+    cout << pwd << endl;
 
 }
 

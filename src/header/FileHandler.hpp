@@ -24,6 +24,7 @@ public:
     static FileHandlerReply readFile(string);       // read noteFiles
     static FileHandlerReply appendFile(string,string);     // append content to files
     static FileHandlerReply createFile(string);
+    static FileHandlerReply removeFile(string);
     static FileHandlerReply testFile(string);
     
 };
@@ -67,10 +68,7 @@ string FileHandler::GetStdoutFromCommand(string cmd) {
 }
 
 FileHandlerReply FileHandler::readFile(string path){
- 
-    if(FileHandler::checkFilename(path)){
-        return FileHandlerReply{"Illegal filename", 1};
-    }
+
     if(path.size() > 100){
         return FileHandlerReply{"string too long", 1};
     }
@@ -117,4 +115,15 @@ FileHandlerReply FileHandler::testFile(string filename){
         return FileHandlerReply{ret, 1};
     }
     return FileHandlerReply{filename, 0};
+}
+
+FileHandlerReply FileHandler::removeFile(string filename){
+    string execute_command1 = "rm *" + filename + ".note";
+    string execute_command2 = "rm *" + filename + ".pwd";
+
+    string reply1 = FileHandler::GetStdoutFromCommand(execute_command1);
+    string reply2 = FileHandler::GetStdoutFromCommand(execute_command2);
+
+
+    return FileHandlerReply{reply1, 0};
 }

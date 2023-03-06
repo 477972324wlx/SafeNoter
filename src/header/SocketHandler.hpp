@@ -7,15 +7,13 @@
 using std::string;
 
 class SocketHandler{
-protected:
+public:
     unsigned short port;
     string addr;
     int sockfd;
     sockaddr_in sock_addr;
-
     char buf[1024];
 
-public:
     static bool checkIPaddress(const string&){return true;}
     SocketHandler(unsigned short &_port, const string& _addr):port(_port), addr(_addr){
         int one = 1;

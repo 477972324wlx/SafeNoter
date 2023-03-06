@@ -102,8 +102,8 @@ void WriteNote(ClientSocketHandler* client) {
     filename = client->getBufferString();
 
     cout << "File Created :" << filename << endl;
-    while(getline(cin, str)){
-        client->trySend(str);
+    while(fgets(client->buf,1024, stdin)){
+        client->trySend(string(client->buf));
     }
 }
 void RemoveNote(ClientSocketHandler* client){
