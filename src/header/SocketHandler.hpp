@@ -13,7 +13,7 @@ protected:
     int sockfd;
     sockaddr_in sock_addr;
 
-    char buf[1000];
+    char buf[1024];
 
 public:
     static bool checkIPaddress(const string&){return true;}
@@ -50,31 +50,14 @@ public:
             perror("Cannot listen to port\n");
         }
     }
-    void tryAccept(){
+    int tryAccept(){
         socklen_t len = sizeof(from_addr);
         clientfd = accept(sockfd, (sockaddr*)&from_addr, &len);
         if(clientfd < 0){
             perror("Unable to accept!\n");
         }
+        return clientfd;
     }
-    bool tryReceive(){
-        memset(buf,0,sizeof(buf));
-        int count = recv(clientfd, buf, sizeof(buf),0);
-        //printf("%s",buf);
-        //send(clientfd, buf, sizeof(buf),0);
-        return count != 0;
-    }
-    void trySend(string ss){
-        if (ss.size() > 1000){
-            perror("String is too long!");
-            return;
-        }
-        write(clientfd, ss.c_str(), ss.size());
-    }
-    void closeSocket(){
-        shutdown(clientfd,SHUT_RDWR);
-    }
-
 };
 
 class ClientSocketHandler : public SocketHandler{
@@ -96,7 +79,7 @@ public:
     }
     void tryReceive(string &err_msg){
         memset(buf,0,sizeof(buf));
-        int count = recv(sockfd, buf, sizeof(buf), 0);
+        int count = recv(sockfd, buf, 1024, 0);
         if(count == 0){
             err_msg = "Empty";
         }

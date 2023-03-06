@@ -1,4 +1,4 @@
 #!/bin/bash
 
-g++ src/Client.cpp -o bin/Client
-g++ src/Server.cpp -o bin/Server
+g++ src/Client.cpp -o bin/Client -lpthread
+g++ src/Server.cpp -o bin/Server -lpthread

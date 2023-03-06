@@ -2,32 +2,22 @@
 #include "header/SocketHandler.hpp"
 using namespace std;
 
+const string addr = "127.0.0.1";
+unsigned short port = 4396;
+
+
 
 void ReadNote(ClientSocketHandler*);
 void WriteNote(ClientSocketHandler*);
 void RemoveNote(ClientSocketHandler*);
 
 
-static int exec_prog(const char **argv)
-{
-    pid_t   my_pid;
-    int     status, timeout /* unused ifdef WAIT_FOR_COMPLETION */;
 
-    if (0 == (my_pid = fork())) {
-            if (-1 == execve(argv[0], (char **)argv , NULL)) {
-                    perror("child process execve failed [%m]");
-                    return -1;
-            }
-    }
-    return 0;
-}
 
 int main(int args, char **argv){
 
     // Address & port for sockets
-    const string addr = "127.0.0.1";
-    unsigned short port = 4396;
-
+    
 
     // Get operation & filename from cmd line
     string oper;
@@ -46,27 +36,36 @@ int main(int args, char **argv){
         }
     }
 
-    
-    const char *my_argv[64] = {"./bin/Server", argv[1],argv[2],NULL};
-   
-    exec_prog(my_argv);
-    usleep(1000);
 
+    if(strlen(argv[1]) + strlen(argv[2]) > 1000){
+        perror("Arguments are too long!\n");
+        exit(1);
+    }
+
+    char requestArgs[1024] = {0};
+    sprintf(requestArgs,"%s;%s", argv[1], argv[2]);
     //store error messages;
-    string err;
-
     
     //connect to server
     ClientSocketHandler client = ClientSocketHandler(port, addr);
     //cout << "Connected" << endl;
-    
-    if(oper == "read"){
+
+
+    client.trySend(string(requestArgs));
+
+
+
+    if(strcmp(argv[1], "read") == 0){
         ReadNote(&client);
-    } else if(oper == "write"){
+    } else if(strcmp(argv[1], "write") == 0){
         WriteNote(&client);
-    } else if (oper ==  "remove"){
+    } else if(strcmp(argv[1], "remove") == 0){
         RemoveNote(&client);
+    } else {
+        perror("Unknown Operation\n");
+        exit(1);
     }
+
 
     /*
     client.tryReceive(err);

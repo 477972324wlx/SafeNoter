@@ -1,30 +1,41 @@
 #include <bits/stdc++.h>
 #include "header/SocketHandler.hpp"
-#include "header/FileHandler.hpp"
+#include "header/ThreadWorker.hpp"
 using namespace std;
 
 
-void ReadNote(ServerSocketHandler*, string);
-void WriteNote(ServerSocketHandler*,string);
-void RemoveNote(ServerSocketHandler*,string);
+//void ReadNote(ServerSocketHandler*, string);
+//void WriteNote(ServerSocketHandler*,string);
+//void RemoveNote(ServerSocketHandler*,string);
+
+const string addr = "127.0.0.1";
+unsigned short port = 4396;
+
 
 
 
 int main(int args, char ** argv){
-    const string addr = "127.0.0.1";
-    unsigned short port = 4396;
-    
-    if(args != 3){
-        return 0;
-    }
+
+
 
 
     ServerSocketHandler server = ServerSocketHandler(port, addr);
     
-    // block until connection
-    server.tryAccept();
-    string op = argv[1];
+     
+    while(1){
+        static int id;
+        int clientfd = server.tryAccept();
 
+        ThreadArgs * newArg = new ThreadArgs();
+        newArg->pid = ++id;
+        newArg->clientfd = clientfd;
+
+        thread newThread = thread(ThreadMain,newArg);
+        newThread.detach();
+    }
+   
+
+/*
     if(op == "read"){
         //cout << "Start reading" << endl;
         ReadNote(&server, argv[2]);
@@ -33,14 +44,14 @@ int main(int args, char ** argv){
     } else if(op == "remove"){
         RemoveNote(&server, argv[2]);
     }
+*/
 
 
-
-    server.closeSocket();
+   // server.closeSocket();
     return 0;
 }
 
-
+/*
 void ReadNote(ServerSocketHandler * server, string filename){
     const int MAX_BUFFER  = 1024;
     char buffer[MAX_BUFFER];
@@ -94,3 +105,4 @@ void RemoveNote(ServerSocketHandler* server,string filename){
     }
     server->trySend(ret);
 }
+*/
