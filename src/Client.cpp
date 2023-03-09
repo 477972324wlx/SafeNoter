@@ -65,21 +65,6 @@ int main(int args, char **argv){
         perror("Unknown Operation\n");
         exit(1);
     }
-
-
-    /*
-    client.tryReceive(err);
-
-    cout << client.getBufferString() << endl;
-
-    string str;
-    while(cin >> str){
-        client.trySend(str);
-        client.tryReceive(err);
-        cout << client.getBufferString() <<endl;
-    }
-    */
-    
   
     return 0;
 }
@@ -91,7 +76,7 @@ void ReadNote(ClientSocketHandler* client){
         if (err != ""){
             break;
         }
-        cout << client->getBufferString() << endl;
+        write(1, client->getBuffer(), strlen(client->getBuffer()));
         
     }   
 }
@@ -101,13 +86,22 @@ void WriteNote(ClientSocketHandler* client) {
     client->tryReceive(err);
     filename = client->getBufferString();
 
-    cout << "File Created :" << filename << endl;
+    cout << filename;
     while(fgets(client->buf,1024, stdin)){
         client->trySend(string(client->buf));
     }
 }
+
 void RemoveNote(ClientSocketHandler* client){
     string err;
+    string str;
+    client->tryReceive(err);
+    cout << client->getBufferString();
+
+    getline(cin,str);
+    client->trySend(str);
+
     client->tryReceive(err);
     cout << client->getBufferString() << endl;
+
 }

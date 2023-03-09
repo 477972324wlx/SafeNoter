@@ -1,9 +1,12 @@
 #include <bits/stdc++.h>
-
+#include <sys/socket.h>
 #include "FileHandler.hpp"
 #include "util.hpp"
+#define DEBUG true
 
 #define MAX_BUFFER 1024
+const char * ok = "OK\n";
+
 struct ThreadArgs{
     int clientfd;
     char filename[MAX_BUFFER];
@@ -14,9 +17,16 @@ struct ThreadArgs{
 };
 typedef std::function<void(ThreadArgs*)> ThreadFunction;
 
+// Thread Operations
+void ThreadMain(ThreadArgs *args);
+void ThreadRead(ThreadArgs *args);
+void ThreadWrite(ThreadArgs *args);
+void ThreadRemove(ThreadArgs *args);
+
+
 
 void ThreadRead(ThreadArgs *args){
-    cout << "Start Reading!\n";
+    DEBUG && cout << "Start Reading!\n";
 
     string execute_command = "cat *"+ string(args->filename)+"*.note";
 
@@ -49,7 +59,7 @@ void ThreadWrite(ThreadArgs *args){
     local_filename = user_filename + "_" + suffix;
 
     password = util::makeRandStr(6, true);
-
+    string hashed_pwd = util::getHashvValue(password);
 
     reply = FileHandler::createFile(local_filename + ".note");
     if(reply.error_code){
@@ -61,10 +71,10 @@ void ThreadWrite(ThreadArgs *args){
         return ;
     }
 
-    reply = FileHandler::appendFile(local_filename + ".pwd", password);
+    reply = FileHandler::appendFile(local_filename + ".pwd", hashed_pwd);
     cout << reply.response << endl;
 
-    sprintf(args->buf, "Filename: %s,Password: %s\n", local_filename.c_str(), password.c_str());
+    sprintf(args->buf, "Filename: %s, Password: %s\n", local_filename.c_str(), password.c_str());
 
     write(args->clientfd, args->buf, strlen(args->buf));
     
@@ -87,14 +97,39 @@ void ThreadWrite(ThreadArgs *args){
 }
 
 void ThreadRemove(ThreadArgs *args){
-    FileHandlerReply reply = FileHandler::testFile("*"+string(args->filename) +".note");
+    string filename = "*"+string(args->filename) +".note";
+    string pwdfile = "*"+string(args->filename) +".pwd";
+
+    FileHandlerReply reply = FileHandler::testFile(filename);
     if(reply.error_code){
+        write(args->clientfd, reply.response.c_str(), reply.response.size());
         return;
     }
     reply = FileHandler::readFile("*"+string(args->filename)+".pwd");
-    string pwd = reply.response;
-    cout << pwd << endl;
 
+    string hashed_pwd = reply.response;
+    const char * msg = "Please input the password!";
+    write(args->clientfd, msg, strlen(msg));
+
+    read(args->clientfd, args->buf, MAX_BUFFER);
+    string user_pwd = string(args->buf);
+
+    if(util::getHashvValue(user_pwd) == hashed_pwd){
+        reply = FileHandler::removeFile(filename);
+        if(reply.error_code){
+            write(args->clientfd, reply.response.c_str(), reply.response.size());
+            return;
+        }
+        reply = FileHandler::removeFile(pwdfile);
+        if(reply.error_code){
+            write(args->clientfd, reply.response.c_str(), reply.response.size());
+            return;
+        }
+        write(args->clientfd, ok, strlen(ok));
+    } else {
+        const char * WrongPassword = "Wrong Password!\n";
+        write(args->clientfd, WrongPassword, strlen(WrongPassword));
+    }
 }
 
 
@@ -131,7 +166,7 @@ ThreadFunction getOperation(ThreadArgs * args){
     }
 
     if(strcmp(args->buf, "read") == 0){
-        cout << "It's read" << endl;
+        //cout << "It's read" << endl;
         return ThreadRead;
     } else if(strcmp(args->buf, "write") == 0){
         return ThreadWrite;
@@ -145,10 +180,10 @@ ThreadFunction getOperation(ThreadArgs * args){
 
 
 void ThreadMain(ThreadArgs* args){
-    printf("In Thread %d \n", args->pid);
+   // printf("In Thread %d \n", args->pid);
     auto Function = getOperation(args);
     if(!Function){
-        cout << "UnKnown Operation" << endl;
+        cout << "UnKnown Operation OR filename" << endl;
         return;
     }
     printf("Thread Working On %s of filename %s\n",args->buf, args->filename);

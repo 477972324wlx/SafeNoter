@@ -38,4 +38,16 @@ namespace util{
         return true;
     }
 
+    bool isOneLine(string str){
+        return str.find_first_of("\n") == str.find_last_of("\n");
+    }
+    
+    string getHashvValue(const string& str){
+        std::hash<string> hasher;
+        size_t hashValue = hasher(str);
+        for (int i = 0 ; i < 100; ++i){
+            hashValue = hasher(std::to_string(hashValue));
+        }
+        return to_string(hashValue);
+    }
 }
