@@ -194,4 +194,5 @@ void ThreadMain(ThreadArgs* args){
     printf("Thread Working On %s of filename %s\n",args->buf, args->filename);
     Function(args);
     shutdown(args->clientfd, SHUT_RDWR);
+    delete args;
 }

@@ -42,10 +42,12 @@ public:
         int err = bind(sockfd, (sockaddr*)&sock_addr, sizeof(sock_addr));
         if(err < 0){
             perror("Cannot Bind Address\n");
+            exit(0);
         }
         err = listen(sockfd,1);
         if(err < 0){
             perror("Cannot listen to port\n");
+            exit(0);
         }
     }
     int tryAccept(){

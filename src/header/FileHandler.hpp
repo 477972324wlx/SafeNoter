@@ -14,12 +14,9 @@ class FileHandler;
 
 
 /*
-    A Static Class used to get input/output From bash.  
-
+    A Static Class used to do file staff 
     Using bash command : cat/rm/print to do the file stuff
-    
-    Linux file command(components) should be safe enough?
-
+    And get the result from stdout
 */
 class FileHandler{
 

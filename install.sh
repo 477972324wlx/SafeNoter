@@ -39,7 +39,7 @@ else
 fi
 
 
-chown ${NOTER_NAME} ${NOTER_PATH} 	
+chown ${NOTER_NAME}:${NOTER_NAME} ${NOTER_PATH} 	
 
 chmod 777 ${NOTER_PATH} 
 

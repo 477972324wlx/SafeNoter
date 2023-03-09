@@ -1,6 +1,4 @@
-
 #include <random>
- 
 using namespace std;
 
 static constexpr char Printable[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

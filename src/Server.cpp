@@ -12,6 +12,11 @@ const string addr = "127.0.0.1";
 unsigned short port = 4396;
 
 
+/*
+    Bind a Socket
+    Whenever receives a connection
+    Create a thread to handle the work
+*/
 
 int main(int args, char ** argv){
     printf("Server launched!\n");
