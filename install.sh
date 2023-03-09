@@ -1,9 +1,13 @@
 #!/bin/bash
-NOTER_PATH="~/MyNoter"
-a=3
 
+USER=$(whoami)
 NOTER_PATH="/home/safe_noter"
 NOTER_NAME="safe_noter"
+
+if [ ! $USER = "root" ]; then
+   echo Should Execute in root privellege
+   exit
+fi
 
 echo Compling......
 
@@ -36,8 +40,20 @@ fi
 
 
 chown ${NOTER_NAME} ${NOTER_PATH} 	
-chmod 600 ${NOTER_PATH} 
+
+chmod 777 ${NOTER_PATH} 
 
 cp bin/Server ${NOTER_PATH}/Server
 
-cd ${NOTER_PATH} && ./Server &
+echo Starting Server...
+
+wait
+cd ${NOTER_PATH}
+su - ${NOTER_NAME} -c "./Server &" 
+
+
+if [ $? -eq 0 ]; then
+    echo OK
+else
+    echo FAIL
+fi
