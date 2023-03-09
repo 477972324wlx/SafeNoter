@@ -122,7 +122,7 @@ FileHandlerReply FileHandler::testFile(string filename){
     if(ret.find("Permission denied") != string::npos){
         return FileHandlerReply{ret, 1};
     }
-    if(util::isOneLine(ret)){
+    if(!util::isOneLine(ret)){
         return FileHandlerReply{"Multiple choices",1};
     }
     return FileHandlerReply{filename, 0};
