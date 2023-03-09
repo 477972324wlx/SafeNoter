@@ -1,7 +1,12 @@
+#ifndef _UTIL
+#include "util.hpp"
+#define _UTIL
+#endif
+
 #include <bits/stdc++.h>
 #include <sys/socket.h>
 #include "FileHandler.hpp"
-#include "util.hpp"
+
 #define DEBUG true
 
 #define MAX_BUFFER 1024

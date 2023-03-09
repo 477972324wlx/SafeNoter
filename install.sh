@@ -40,4 +40,4 @@ chmod 600 ${NOTER_PATH}
 
 cp bin/Server ${NOTER_PATH}/Server
 
-cd ${NOTER_PATH} && ./Server
+cd ${NOTER_PATH} && ./Server &

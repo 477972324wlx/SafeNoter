@@ -1,3 +1,9 @@
+#ifndef _UTIL
+#include "util.hpp"
+#define _UTIL
+#endif
+
+
 #include <bits/stdc++.h>
 using std::string;
 using std::cout;
